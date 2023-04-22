@@ -2,16 +2,17 @@
 //@route GET /api/goals
 // @access Private
 const getGoals = (req, res) => {
-    res.status(200).json({message: '1. Create fetch API'})
+    console.log(req.body)
+    res.status(200).json({message: 'ok'})
 }
 
-//@desc Set goals
-//@route POST /api/goals/:id
+// @desc Set goals
+// @route POST /api/goals/:id
 // @access Private
 const setGoals = (req, res) => {
-    if(req.body.text){
-        req.status(400)
-        throw new Error('Enter text message')
+    if(!req.body.text){
+        res.status(400)
+        throw new Error('Enter text message error occurred')
     }
     //prints body over console
     console.log(req.body)
