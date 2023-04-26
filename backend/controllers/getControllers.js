@@ -1,17 +1,25 @@
 const asyncHandler = require('express-async-handler')
-//@desc Get goals
-//@route GET /api/goals
+
+//importing schema model
+const User = require('../models/userModel')
+const { default: mongoose } = require('mongoose')
+
+
+
+//@desc Get users
+//@route GET /api/users
 // @access Private
-const getGoals = asyncHandler(async(req, res) => {
+const getUsers = asyncHandler(async(req, res) => {
+    const users = await User.find()
     console.log(req.body)
-    res.status(200).json({message: 'ok'})
+    res.status(200).json(users)
 })
 
-//@desc Get goals
-//@route GET /api/goals
+
+//@desc Get users
+//@route GET /api/users
 // @access Private
-const getGoal = asyncHandler(async(req, res) => {
-    console.log(req.body)
+const getUser = asyncHandler(async(req, res) => {
     if(!req.params.id){
         res.status(404)
         throw new Error('File not found')
@@ -20,38 +28,82 @@ const getGoal = asyncHandler(async(req, res) => {
 })
 
 
-// @desc Set goals
-// @route POST /api/goals/
+// @desc Set users
+// @route POST /api/users/
 // @access Private
-const setGoals = asyncHandler(async(req, res) => {
-     if(!req.body.text){
-         res.status(400)
-         throw new Error('Enter text message error occurred')
-    }
+const setUsers = asyncHandler(async(req, res) => {
     // prints body over console
-    console.log(req.body)
-    res.status(200).json({message: 'text'})
-})
- 
-//@desc Update goals
-//@route PUT /api/goals/ 
-// @access Private
-const updateGoals = asyncHandler(async(req, res) => {
-    res.status(200).json({message: `3. Create fetch API no. ${req.params.id}`})
+    const users = await User.create({
+        name: req.get("name"),
+        phone: req.get("phone"),
+        username: req.get("username"),
+        designation: req.get("designation")
+    })
+    res.status(200).json(users)
 })
 
-//@desc Delete goals
-//@route DELETE /api/goals
+ 
+//@desc Update users
+//@route PUT /api/users/ 
 // @access Private
-const deleteGoals = asyncHandler(async(req, res) => {
-    res.status(200).json({message: `4. Create fetch API no. ${req.params.id}`})
-}
-)
+const updateUsers = asyncHandler(async(req, res) => {
+    // if(!req.params.id){
+    //     res.status(400).send("enter id in parameter")
+    //     console.log("Empty id field")
+    // }
+    // const user = await User.findByIdAndUpdate(req.params.id, {
+    //     name: req.body.name,
+    //     phone: req.body.phone,
+    //     username: req.body.username,
+    //     designation: req.body.designation,
+    // }, {
+    //     new: true,
+    // })
+    
+    const user = await User.findByIdAndUpdate({_id: req.get("_id")},
+    {
+        name: req.body.name,
+        phone: req.body.phone,
+        username: req.body.username,
+        designation: req.body.designation,
+    }
+    ,{new: true,})
+
+    if(!user){
+       res.status(404).send("No user found")
+    }
+
+    res.status(200).send("user updated")
+
+})
+
+
+//@desc Delete users
+//@route DELETE /api/users
+// @access Private
+const deleteUsers = asyncHandler(async(req, res) => {
+    const user = await User.findByIdAndDelete(req.get("_id"))
+    if (user === null) {
+        console.log("No user found with this ID")
+        res.status(404).send("No user found")
+    } else {
+        console.log("User found and deleted: " + user)
+        res.status(200).json(user)
+    }
+    // const deleteduser = await User.findById(req.get("_id"))
+    // if(!deleteduser){
+    //     res.status(400)
+    //     throw new Error("User is not there to remove")
+    // }
+    // await User.deleteOne()
+})
+
+//exporting methods of module
 module.exports = {
-    getGoals,
-    getGoal,
-    setGoals,
-    updateGoals,
-    deleteGoals
+    getUsers,
+    getUser,
+    setUsers,
+    updateUsers,
+    deleteUsers
   
 }
