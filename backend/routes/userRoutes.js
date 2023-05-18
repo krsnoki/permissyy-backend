@@ -7,6 +7,8 @@ const {
     setUsers,
     updateUsers, 
     deleteUsers,
+    findUser,
+    
 } = require('../controllers/getControllers')
 
 
@@ -16,5 +18,6 @@ router.route('/createUser').post(setUsers)
 //ids are passed through header: res.get
 router.route('/deleteUser').delete(deleteUsers)
 router.route('/updateUser').put(updateUsers)
+router.route('/findUser').get(findUser)
 
 module.exports = router

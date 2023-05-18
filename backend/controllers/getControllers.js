@@ -37,7 +37,8 @@ const setUsers = asyncHandler(async(req, res) => {
         name: req.get("name"),
         phone: req.get("phone"),
         username: req.get("username"),
-        designation: req.get("designation")
+        designation: req.get("designation"),
+        email: req.get("email")
     })
     res.status(200).json(users)
 })
@@ -66,6 +67,7 @@ const updateUsers = asyncHandler(async(req, res) => {
         phone: req.body.phone,
         username: req.body.username,
         designation: req.body.designation,
+        email: req.body.email,
     }
     ,{new: true,})
 
@@ -98,12 +100,35 @@ const deleteUsers = asyncHandler(async(req, res) => {
     // await User.deleteOne()
 })
 
+const mailUser = asyncHandler(async(req, res) => {
+    const user = await User.findOne(req.get("name"))
+
+    if (user === null) {
+        console.log("Error!, user not found");
+        res.status(404).send("Not a registered user !")
+    }else{
+        console.log("found")
+    }
+})
+
+const findUser = asyncHandler(async(req, res) => {
+    const user = await User.findOne(req.params("name"))
+
+    if(user === null){
+        console.log("no user")
+        res.status(404).send("No user found!")
+    } else {
+        res.status(200).send(user)
+    }
+})
+
 //exporting methods of module
 module.exports = {
     getUsers,
     getUser,
     setUsers,
     updateUsers,
-    deleteUsers
+    deleteUsers,
+    findUser,
   
 }
