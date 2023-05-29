@@ -12,7 +12,7 @@ const colors = require('colors')
 //initialising app
 const app = express()
 
-const path = require('path');
+
 
 //port from env file currently set to 3000
 const port =  process.env.PORT || 3000
@@ -20,13 +20,14 @@ const port =  process.env.PORT || 3000
 //nodemailer package for sending mails
 const nodemailer = require('nodemailer')
 
+
 //connection to db
 const connectDB = require('./config/db')
 connectDB() //making a call to connection function to primt token
 
 app.use(bodyParser.json());
-
-app.use(express.urlencoded({ extended: false}))
+app.use(express.json());
+app.use(express.urlencoded({ extended: true}))
 const { errorHandler } = require('./middleware/errorMiddleware');
 
 
@@ -38,3 +39,5 @@ app.use('/api/users', require('./routes/userRoutes'))
 app.use(errorHandler)
 
 app.listen(port, () => console.log(`Server started on port ${port}`))
+
+

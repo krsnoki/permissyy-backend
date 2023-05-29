@@ -1,4 +1,8 @@
 const asyncHandler = require('express-async-handler')
+const nodemailer = require('nodemailer')
+const path = require('path');
+//handlebar for node mailer
+const hbs = require('nodemailer-express-handlebars')
 
 //importing schema model
 const User = require('../models/userModel')
@@ -33,14 +37,56 @@ const getUser = asyncHandler(async(req, res) => {
 // @access Private
 const setUsers = asyncHandler(async(req, res) => {
     // prints body over console
-    const users = await User.create({
+    const user = await User.create({
         name: req.get("name"),
         phone: req.get("phone"),
         username: req.get("username"),
         designation: req.get("designation"),
         email: req.get("email")
     })
-    res.status(200).json(users)
+            // initialize nodemailer
+            var transporter = nodemailer.createTransport(
+                {
+                    service: 'gmail',
+                    auth:{
+                        user: '2710kklyani@gmail.com',
+                        pass: 'jtgjygelfaqvpkxa'
+                    }
+                }
+            );        
+            // point to the template folder
+            const handlebarOptions = {
+                viewEngine: {
+                    partialsDir: path.resolve('./views/'),
+                    defaultLayout: false,
+                },
+                viewPath: path.resolve('./backend/views'),
+            };
+            
+            // use a template file with nodemailer
+            transporter.use('compile', hbs(handlebarOptions))
+            
+            
+            var mailOptions = {
+                from: '"Kalyani Kolte" <2710kkalyani@gmail.com>', // sender address
+                to: user.email, // list of receivers
+                subject: 'New Account Created!!',
+                template: 'userCreated', // the name of the template file i.e email.handlebars
+                context:{
+                    name: user.name, // replace {{name}} 
+                    username: user.username,
+                    des: user.designation,
+                }
+            };
+            // trigger the sending of the E-mail
+            transporter.sendMail(mailOptions, function(error, info){
+                if(error){
+                    return console.log(error);
+                }
+                console.log('Message sent: ' + info.response);
+            });
+
+            res.status(200).send(user)
 })
 
  
@@ -90,7 +136,54 @@ const deleteUsers = asyncHandler(async(req, res) => {
         res.status(404).send("No user found")
     } else {
         console.log("User found and deleted: " + user)
-        res.status(200).json(user)
+
+    
+
+    // initialize nodemailer
+    var transporter = nodemailer.createTransport(
+        {
+            service: 'gmail',
+            auth:{
+                user: '2710kklyani@gmail.com',
+                pass: 'jtgjygelfaqvpkxa'
+            }
+        }
+    );
+    
+            
+    // point to the template folder
+    const handlebarOptions = {
+        viewEngine: {
+            partialsDir: path.resolve('./views/'),
+            defaultLayout: false,
+        },
+        viewPath: path.resolve('./backend/views'),
+    };
+    
+    // use a template file with nodemailer
+    transporter.use('compile', hbs(handlebarOptions))
+    
+    
+    var mailOptions = {
+        from: '"Kalyani Kolte" <2710kkalyani@gmail.com>', // sender address
+        to: user.email, // list of receivers
+        subject: 'Attention User Deleted!',
+        template: 'userDelete', // the name of the template file i.e email.handlebars
+        context:{
+            name: user.name, // replace {{name}} with Adebola
+        
+        }
+    };
+    
+    // trigger the sending of the E-mail
+    transporter.sendMail(mailOptions, function(error, info){
+        if(error){
+            return console.log(error);
+        }
+        console.log('Message sent: ' + info.response);
+    });
+
+    res.status(200).json(user)
     }
     // const deleteduser = await User.findById(req.get("_id"))
     // if(!deleteduser){
@@ -98,27 +191,81 @@ const deleteUsers = asyncHandler(async(req, res) => {
     //     throw new Error("User is not there to remove")
     // }
     // await User.deleteOne()
+
 })
 
+
+
 const mailUser = asyncHandler(async(req, res) => {
-    const user = await User.findOne(req.get("name"))
+    const user = await User.findOne({ "name": req.get("name")})
 
     if (user === null) {
         console.log("Error!, user not found");
         res.status(404).send("Not a registered user !")
     }else{
         console.log("found")
+        // initialize nodemailer
+            var transporter = nodemailer.createTransport(
+                {
+                    service: 'gmail',
+                    auth:{
+                        user: '2710kklyani@gmail.com',
+                        pass: 'jtgjygelfaqvpkxa'
+                    }
+                }
+            );
+            
+                    
+            // point to the template folder
+            const handlebarOptions = {
+                viewEngine: {
+                    partialsDir: path.resolve('./views/'),
+                    defaultLayout: false,
+                },
+                viewPath: path.resolve('./backend/views'),
+            };
+            
+            // use a template file with nodemailer
+            transporter.use('compile', hbs(handlebarOptions))
+            
+            
+            var mailOptions = {
+                from: '"Kalyani Kolte" <2710kkalyani@gmail.com>', // sender address
+                to: user.email, // list of receivers
+                subject: 'Welcome to Permissy!!',
+                template: 'hello', // the name of the template file i.e email.handlebars
+                context:{
+                    name: user.name, // replace {{name}} with Adebola
+                
+                }
+            };
+            
+            // trigger the sending of the E-mail
+            transporter.sendMail(mailOptions, function(error, info){
+                if(error){
+                    return console.log(error);
+                }
+                console.log('Message sent: ' + info.response);
+            });
+
+            res.status(200).json(user)
     }
-})
+
+    }
+)
+
+
+
 
 const findUser = asyncHandler(async(req, res) => {
-    const user = await User.findOne(req.params("name"))
+    const user = await User.find({"name": req.get("name")})
 
     if(user === null){
         console.log("no user")
         res.status(404).send("No user found!")
     } else {
         res.status(200).send(user)
+        console.log(user)
     }
 })
 
@@ -130,5 +277,5 @@ module.exports = {
     updateUsers,
     deleteUsers,
     findUser,
-  
+    mailUser,
 }

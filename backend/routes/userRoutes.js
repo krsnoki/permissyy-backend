@@ -12,10 +12,11 @@ const {
 } = require('../controllers/getControllers')
 
 
+
 router.route('/getUser').get(getUsers)
 router.route('/createUser').post(setUsers)
+router.route('/searchUser').get(findUser)
 
-//ids are passed through header: res.get
 router.route('/deleteUser').delete(deleteUsers)
 router.route('/updateUser').put(updateUsers)
 router.route('/findUser').get(findUser)

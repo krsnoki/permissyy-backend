@@ -1,6 +1,7 @@
 const mongoose = require('mongoose')
 
-const grantorModel = mongoose.Schema({
+const grantorSchema = mongoose.Schema({
+    gID: {type: Number},
     name: {type: String},
     email: { type: String,
         required: true,
@@ -9,3 +10,5 @@ const grantorModel = mongoose.Schema({
     role: {type: String}
     
 })
+
+module.exports = mongoose.model(Grantor, grantorSchema)
