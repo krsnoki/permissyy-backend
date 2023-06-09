@@ -50,7 +50,7 @@ const setUsers = asyncHandler(async(req, res) => {
                     service: 'gmail',
                     auth:{
                         user: '2710kklyani@gmail.com',
-                        pass: 'jtgjygelfaqvpkxa'
+                        pass: 'lhvyxjjyzjcncngh'
                     }
                 }
             );        
@@ -145,7 +145,7 @@ const deleteUsers = asyncHandler(async(req, res) => {
             service: 'gmail',
             auth:{
                 user: '2710kklyani@gmail.com',
-                pass: 'jtgjygelfaqvpkxa'
+                pass: 'lhvyxjjyzjcncngh'
             }
         }
     );
