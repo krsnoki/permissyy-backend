@@ -10,9 +10,7 @@ const { default: mongoose } = require('mongoose')
 
 
 
-//@desc Get users
-//@route GET /api/users
-// @access Private
+
 const getUsers = asyncHandler(async(req, res) => {
     const users = await User.find()
     console.log(req.body)
@@ -20,21 +18,22 @@ const getUsers = asyncHandler(async(req, res) => {
 })
 
 
-//@desc Get users
-//@route GET /api/users
-// @access Private
+
 const getUser = asyncHandler(async(req, res) => {
-    if(!req.params.id){
-        res.status(404)
-        throw new Error('File not found')
+    const user = await User.find({ "uname": req.get("username")});
+
+
+    if(user === null){
+        console.log("no user")
+        res.status(404).send("No user found!")
+    } else {
+        res.status(200).send(user)
+        console.log(user)
     }
-    res.status(200).json({message: `getting id: ${req.params.id}`})
 })
 
 
-// @desc Set users
-// @route POST /api/users/
-// @access Private
+
 const setUsers = asyncHandler(async(req, res) => {
     // prints body over console
     const user = await User.create({
@@ -258,7 +257,7 @@ const mailUser = asyncHandler(async(req, res) => {
 
 
 const findUser = asyncHandler(async(req, res) => {
-    const user = await User.find({"name": req.get("name")})
+    const user = await User.find({"username": req.get("username")})
 
     if(user === null){
         console.log("no user")

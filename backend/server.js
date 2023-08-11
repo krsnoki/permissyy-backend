@@ -6,6 +6,9 @@ const bodyParser = require('body-parser')
 //dotenv req.
 const dotenv = require('dotenv').config() 
 
+//cross origin resource sharing issue overcomed
+const cors = require('cors');
+
 //importing colors
 const colors = require('colors')
 
@@ -30,6 +33,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true}))
 const { errorHandler } = require('./middleware/errorMiddleware');
 
+app.use(cors());
 
 // Render Html File
 app.get('/', function(req, res) {
