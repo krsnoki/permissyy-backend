@@ -1,20 +1,25 @@
-//for schema required here
-//bringing in mongoose
-const mongoose = require('mongoose')
+const { Schema, model } = require('mongoose');
 
-const userSchema = mongoose.Schema({
-    userID:{type: Number},
-    name:{type: String},
-    phone:{type: Number},
-    username:{type: String},
-    designation:{type: String},
-    email: {
-        type: String,
-        required: true,
-        unique: true,
-        match: /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-      },
-}
-)
+const userSchema = new Schema({
+  userID: Number,
+  name: String,
+  phone: {
+    type: String,
+    required: true,
+    validate: {
+      validator: value => /^\d{10}$/.test(value),
+      message: 'Invalid phone number format'
+    }
+  },
+  username: String,
+  role: String,
+  email: {
+    type: String,
+    required: true,
+    unique: true,
+    match: /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  },
+  password: String
+});
 
-module.exports = mongoose.model('User', userSchema)
+module.exports = model('User', userSchema);

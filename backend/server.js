@@ -1,47 +1,65 @@
-//importing express 
-const express = require('express')
+const express = require('express');
 
-//parsing body in json
-const bodyParser = require('body-parser')
-//dotenv req.
-const dotenv = require('dotenv').config() 
-
-//cross origin resource sharing issue overcomed
+const bodyParser = require('body-parser');
+const dotenv = require('dotenv').config();
+const mongoose = require('mongoose');
 const cors = require('cors');
 
-//importing colors
-const colors = require('colors')
+const nodemailer = require('nodemailer');
+const connectDB = require('./config/db');
 
-//initialising app
-const app = express()
-
-
-
-//port from env file currently set to 3000
-const port =  process.env.PORT || 3000
-
-//nodemailer package for sending mails
-const nodemailer = require('nodemailer')
-
-
-//connection to db
-const connectDB = require('./config/db')
-connectDB() //making a call to connection function to primt token
-
-app.use(bodyParser.json());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true}))
 const { errorHandler } = require('./middleware/errorMiddleware');
 
+const passport = require('passport');
+const passportJwt = require('passport-jwt');
+
+
+const keys = require('./config/key');
+
+// Import routes
+const authRoutes = require('./routes/auth'); 
+const userRoutes = require('./routes/userRoutes')
+
+const app = express();
+const port = process.env.PORT || 3000;
+
+// Middleware
+app.use(bodyParser.json());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 
-// Render Html File
-app.get('/', function(req, res) {
-  res.send( 200)
+// Connect to the database
+connectDB();
+
+// Passport configuration
+const JwtStrategy = passportJwt.Strategy;
+const ExtractJwt = passportJwt.ExtractJwt;
+
+const opts = {};
+opts.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();
+opts.secretOrKey = keys.secretOrKey;
+
+passport.use(
+  new JwtStrategy(opts, (jwt_payload, done) => {
+    User.findById(jwt_payload.id)
+      .then((user) => {
+        if (user) {
+          return done(null, user);
+        }
+        return done(null, false);
+      })
+      .catch((err) => console.error(err));
+  })
+);
+
+// Use authentication routes
+app.use('/auth', authRoutes);
+app.use('/', userRoutes);
+
+app.use(errorHandler);
+
+// Start the server
+app.listen(port, () => {
+  console.log(`Server started on port ${port}`);
 });
-app.use('/api/users', require('./routes/userRoutes'))
-app.use(errorHandler)
-
-app.listen(port, () => console.log(`Server started on port ${port}`))
-
-
