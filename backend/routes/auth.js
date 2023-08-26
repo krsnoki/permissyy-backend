@@ -1,5 +1,5 @@
 // routes/auth.js
-const express = require('express');
+const express = require('express')
 const passport = require('passport');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
@@ -8,8 +8,10 @@ const path = require('path');
 const hbs = require('nodemailer-express-handlebars');
 const keys = require('../config/key');
 const User = require('../models/userModel');
+const { authenticateJWT } = require('../middleware/fetchUser');
 
 const router = express.Router();
+const saltrounds = 10;
 
 
 const transporter = nodemailer.createTransport({
@@ -74,7 +76,7 @@ const transporter = nodemailer.createTransport({
       });
     };
     
-    
+     
 // Register route
 router.post('/signup', async (req, res) => {    
   try {
@@ -85,7 +87,10 @@ router.post('/signup', async (req, res) => {
       return res.status(400).json({ message: 'Username already exists' });
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
+    console.log(password + " here it is")
+
+    const salt = await bcrypt.genSalt(saltrounds);
+    const hashedPassword = await bcrypt.hash(password, salt);
 
     const newUser = new User({
         name, 
@@ -96,8 +101,10 @@ router.post('/signup', async (req, res) => {
       password: hashedPassword,
     });
 
+    console.log("new user is " + newUser);
+
     await newUser.save();
-    sendUserCreatedEmail(user);
+    sendUserCreatedEmail(newUser);
     res.status(201).json({ message: 'User registered successfully' });
   } catch (error) {
     console.error(error);
@@ -106,7 +113,7 @@ router.post('/signup', async (req, res) => {
 });
 
 // Login route
-router.post('/login', async (req, res) => {
+router.post('/login', authenticateJWT, async (req, res) => {
   try {
     const { username, password} = req.body;
 
@@ -114,9 +121,13 @@ router.post('/login', async (req, res) => {
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
+    else{
+      return res.status(200).json({ message: 'User found' });
+    }
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
+      res.send("Invalid Password")
       return res.status(401).json({ message: 'Invalid password' });
     }
 
@@ -133,6 +144,6 @@ router.post('/login', async (req, res) => {
     console.error(error);
     res.status(500).json({ message: 'Internal server error' });
   }
-});
+}); 
 
 module.exports = router;

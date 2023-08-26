@@ -5,6 +5,31 @@ const nodemailer = require('nodemailer');
 const path = require('path');
 const hbs = require('nodemailer-express-handlebars');
 const User = require('../models/userModel'); // Import User model
+const { authenticateJWT } = require('../middleware/fetchUser');
+
+
+async function hashPassword(password) {
+  try {
+    const salt = await bcrypt.genSalt(saltrounds); 
+    const hash = await bcrypt.hash(password, salt); 
+    return hash;
+  } catch (error) {
+    throw error;
+  }
+}
+
+// Compare a password with its hashed version
+async function comparePasswords(plainPassword, hashedPassword) {
+  try {
+    const isMatch = await bcrypt.compare(plainPassword, hashedPassword); // Compare the passwords
+    return isMatch;
+  } catch (error) {
+    throw error;
+  }
+}
+
+
+
 
 // Create a transporter for sending emails
 const transporter = nodemailer.createTransport({
@@ -68,7 +93,6 @@ const sendUserCreatedEmail = (user) => {
     }
   });
 };
-
 // Send a user deleted email
 const sendUserDeletedEmail = (user) => {
   const mailOptions = {
@@ -90,6 +114,10 @@ const sendUserDeletedEmail = (user) => {
   });
 };
 
+
+
+
+
 // Route: GET /api/users/getUsers
 router.get('/getUsers', asyncHandler(async (req, res) => {
   const users = await User.find();
@@ -97,11 +125,11 @@ router.get('/getUsers', asyncHandler(async (req, res) => {
 }));
 
 // Route: POST /api/users/createUser
-router.post('/createUser', asyncHandler(async (req, res) => {
+router.post('/createUser', authenticateJWT, asyncHandler(async (req, res) => {
   const { name, phone, username, designation, email } = req.body;
 
   const user = await User.create({
-    name,
+    name, 
     phone,
     username,
     designation,

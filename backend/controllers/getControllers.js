@@ -98,7 +98,7 @@ router.get('/getUsers', asyncHandler(async (req, res) => {
 
 // Route: POST /api/users/createUser
 router.post('/createUser', asyncHandler(async (req, res) => {
-  const { name, phone, username, designation, email } = req.body;
+  const { name, phone, username, designation, email, password } = req.body;
 
   const user = await User.create({
     name,
@@ -106,7 +106,8 @@ router.post('/createUser', asyncHandler(async (req, res) => {
     username,
     designation,
     email,
-  });
+    password,
+  }); 
 
   sendUserCreatedEmail(user);
 
