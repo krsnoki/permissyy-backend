@@ -10,11 +10,11 @@ const opts = {};
 opts.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();
 opts.secretOrKey = keys.secretOrKey;
 
-opts.secretOrKey = keys.secretOrKey;
 passport.use(
   new JwtStrategy(opts, async (jwtPayload, done) => {
     try {
-      const user = await User.findById(jwtPayload.id);
+      const user = await User.findOne(jwtPayload.sr);
+      console.log(user);
       if (user) {
         return done(null, user);
       } else {
@@ -25,9 +25,18 @@ passport.use(
     }
   })
 );
-
-const authenticateJWT = passport.authenticate('jwt', { session: false });
-
+const authenticateJWT = (req, res, next) => {
+  passport.authenticate('jwt', { session: false }, (err, user) => {
+    if (err) {
+      return res.status(500).json({ message: 'Internal server error' });
+    }
+    if (!user) {
+      return res.status(401).json({ message: 'Unauthorized' });
+    }
+    req.user = user; // Set the authenticated user in the request object
+    next(); // Proceed to the next middleware/route handler
+  })(req, res, next);
+};
 module.exports = {
   authenticateJWT,
 };

@@ -118,13 +118,12 @@ const sendUserDeletedEmail = (user) => {
 
 
 
-// Route: GET /api/users/getUsers
+// 
 router.get('/getUsers', asyncHandler(async (req, res) => {
   const users = await User.find();
   res.status(200).json(users);
 }));
 
-// Route: POST /api/users/createUser
 router.post('/createUser', authenticateJWT, asyncHandler(async (req, res) => {
   const { name, phone, username, designation, email } = req.body;
 

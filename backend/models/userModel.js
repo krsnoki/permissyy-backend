@@ -5,20 +5,20 @@ const userSchema = new Schema({
   name: String,
   phone: {
     type: String,
-    // required: true,
-    // validate: {
-    //   validator: value => /^\d{10}$/.test(value),
-    //   message: 'Invalid phone number format'
-    // }
+    required: true,
+    validate: {
+      validator: value => /^\d{10}$/.test(value),
+      message: 'Invalid phone number format'
+    }
   },
 
   username: String,
   role: String,
   email: {
     type: String,
-    // required: true,
-    // unique: true,
-    // match: /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    required: true,
+    unique: true,
+    match: /^[^\s@]+@[^\s@]+\.[^\s@]+$/
   },
   password: String
 });

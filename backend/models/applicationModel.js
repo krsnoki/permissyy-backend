@@ -1,14 +1,15 @@
-const mongoose = require('mongoose')
+const mongoose = require('mongoose');
 
-const applicationSchema = mongoose.Schema({
-    aID : {type: Number,
-        
-    },
-    body : {type: String},
-    applicant:{ type: String},
-    reciever: {type: String},
-    status: {type: String},
-    
-})
 
-module.exports = mongoose.model('Application', 'applicationSchema')
+const applicationSchema = new mongoose.Schema({
+    applicant: { type: String, required: true },
+    body: { type: Object, required: true },
+    recieverId: { type: String, required: true },
+    status: { type: String, required: true },
+    date: { type: Date, required: true },
+    time: { type: String, required: true },
+  });
+  
+
+// Export the model properly
+module.exports = mongoose.model('Application', applicationSchema);

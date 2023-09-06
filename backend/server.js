@@ -19,6 +19,7 @@ const keys = require('./config/key');
 // Import routes
 const authRoutes = require('./routes/auth'); 
 const userRoutes = require('./routes/userRoutes')
+const applicationRoutes = require('./routes/applicationRoutes')
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -35,7 +36,7 @@ connectDB();
 // Use authentication routes
 app.use('/auth', authRoutes);
 app.use('/', userRoutes);
-
+app.use('/requests/', applicationRoutes);
 app.use(errorHandler);
 
 // Start the server

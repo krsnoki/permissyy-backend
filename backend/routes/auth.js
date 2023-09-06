@@ -112,22 +112,18 @@ router.post('/signup', async (req, res) => {
   }
 });
 
-// Login route
-router.post('/login', authenticateJWT, async (req, res) => {
+// login api for user authentication
+router.post('/login', async (req, res) => {
   try {
-    const { username, password} = req.body;
+    const { username, password } = req.body;
 
     const user = await User.findOne({ username });
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
-    else{
-      return res.status(200).json({ message: 'User found' });
-    }
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
-      res.send("Invalid Password")
       return res.status(401).json({ message: 'Invalid password' });
     }
 
@@ -139,11 +135,11 @@ router.post('/login', authenticateJWT, async (req, res) => {
 
     const token = jwt.sign(payload, keys.secretOrKey, { expiresIn: '1h' });
 
-    res.json({ token });
+    res.json( { payload, token } );
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Internal server error' });
   }
-}); 
+});
 
 module.exports = router;
