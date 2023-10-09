@@ -6,7 +6,7 @@ const applicationSchema = new mongoose.Schema({
     body: { type: Object, required: true },
     recieverId: { type: String, required: true },
     status: { type: String, required: true },
-    date: { type: Date, required: true },
+    date: { type: String, required: true },
     time: { type: String, required: true },
   });
   
